@@ -71,7 +71,7 @@ def _dimargs(shape):
     return ', '.join(['uint32_t i%d'%i for i, r in enumerate(shape.dims)])
 
 def _dimexpr(shape):
-    return ''.join(['[i%d]'%i for i in range(len(shape.dims))])
+    return ''.join(['.at(i%d)'%i for i in range(len(shape.dims))])
 
 def _dimarray(shape):
     return ', '.join([_interpolate(str(s)) for s in shape.dims])

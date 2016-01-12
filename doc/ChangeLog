@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-19
+2016-1-12 David Schneider
+- switch to safe access to list of object data members in pds2psana backend,
+  JIRA PSAS-208
+	
 Tag: V00-13-18
 2015-5-28 David
 - When running the ddl compiler and the -d switch to include devel types has

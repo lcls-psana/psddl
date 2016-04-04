@@ -210,6 +210,22 @@ class DdlPdsdata ( object ) :
         # skip included types
         if type.included : return
 
+        # check for tag combinations that don't make sense
+        if 'config' in type.tags and 'value-type' in type.tags:
+            DDL_FORCE = os.environ.get('DDL_FORCE',0)
+            if DDL_FORCE:
+                msg = "DDL_FORCE: allowing value_type and config(...) "
+                msg += "tag combinations for %s" % type.fullName()
+                print msg
+            else:
+                msg = "The type %s has both the tags" % type.fullName()
+                msg += " [[value_type]] and [[config(...)]]."
+                msg += " This will probably break psana code generation."
+                msg += " Removing the [[value_type]] will fix this."
+                msg += " If you are sure using both tags is correct,"
+                msg += " set the environment variable DDL_FORCE=1"
+                raise Exception(msg)
+
         codegen = CppTypeCodegen(self.inc, self.cpp, type, pdsdata=True)
         codegen.codegen()
 

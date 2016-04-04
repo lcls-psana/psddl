@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-20
+2016-4-4 David Schneider
+- add -s --show option to dll gen scripts to see list of standard excludes.
+- don't allow [[value_type]] and [[config(X)]] tag combos, 
+  unless DDL_FORCE=1 set in environment, JIRA PSAS-223
+
 Tag: V00-13-19
 2016-1-12 David Schneider
 - switch to safe access to list of object data members in pds2psana backend,

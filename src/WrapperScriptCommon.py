@@ -138,7 +138,13 @@ def standardWrapper(description, epilog=programDescriptionEpilog,
     parser.add_argument('-v', '--verbose', action='store_true', help="verbose output for script (not backend)", default=False)
     parser.add_argument('-i', '--include', type=str, help="explicitly provid the DDL packages to include as a comma separated list", default=None)
     parser.add_argument('-x', '--exclude', type=str, help="explicitly set the DDL packages to exclude as a comma separated list", default=None)
+    parser.add_argument('-s', '--show', action='store_true', help="show default excluded files", default=False)
     args = parser.parse_args()
+
+    if args.show:
+        print "Default exclude: %s" % defaultExclude
+        print "exiting early."
+        sys.exit(0)
 
     exclude = list(copy.deepcopy(defaultExclude))
     if args.exclude:

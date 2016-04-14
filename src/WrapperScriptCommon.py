@@ -131,11 +131,14 @@ def standardWrapper(description, epilog=programDescriptionEpilog,
      
       The latter is from the @package declaration within timetool.ddl
     '''
+    mxBackendLogLevel=3
+
     parser = argparse.ArgumentParser(description=description,
                                      epilog=epilog,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-d', '--devel', action='store_true', help="include DDL types with the DEVEL tag", default=False)
     parser.add_argument('-v', '--verbose', action='store_true', help="verbose output for script (not backend)", default=False)
+    parser.add_argument('-l', '--log', type=int, help='log level for backend, 1 (info), 2 (trace) or 3 (debug)', default=0)
     parser.add_argument('-i', '--include', type=str, help="explicitly provid the DDL packages to include as a comma separated list", default=None)
     parser.add_argument('-x', '--exclude', type=str, help="explicitly set the DDL packages to exclude as a comma separated list", default=None)
     parser.add_argument('-s', '--show', action='store_true', help="show default excluded files", default=False)
@@ -196,7 +199,12 @@ def standardWrapper(description, epilog=programDescriptionEpilog,
     psddlCmdStart = 'psddlc '
     if args.devel:
         psddlCmdStart += '-D '
-
+    if args.log > mxBackendLogLevel:
+        args.log=mxBackendLogLevel
+        sys.stderr.write("WARNING: log level for backend > %d specified, ignoring, using %d (debug)" % mxBackendLogLevel)
+    while args.log > 0:
+        psddlCmdStart += '-v '
+        args.log -= 1
     sys.stdout.flush()
     sys.stderr.flush()
     return  psddlCmdStart, args.verbose, pkgdict

@@ -129,8 +129,8 @@ class DdlHdf5Data ( object ) :
         if self.dump_schema: return self._dumpSchema(model)
         
         # open output files
-        self.inc = file(self.incname, 'w')
-        self.cpp = file(self.cppname, 'w')
+        self.inc = file(self.incname, 'w', 0)
+        self.cpp = file(self.cppname, 'w', 0)
         
         # include guard to header
         print >>self.inc, "#ifndef", self.guard 

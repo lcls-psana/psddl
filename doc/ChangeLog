@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-21
+2016-4-14 David Schneider
+- add method_domain tag to hdf5 backend to generate code to tranlsate a
+  dataset from a method. JIRA PSAS-227
+- write the inc and cpp files unbuffered to ease debugging.
+- add -l=3 (or 2,1) option to wrapper scripts to pass on loggin level to psddlc
+	
 Tag: V00-13-20
 2016-4-4 David Schneider
 - add -s --show option to dll gen scripts to see list of standard excludes.

@@ -528,7 +528,7 @@ class HddlReader ( object ) :
         """Method which parses definition of h5 dataset"""
 
         # check tag names
-        self._checktags(dsdecl, ['method', 'vlen', 'external', 'zero_dims', 'doc'])
+        self._checktags(dsdecl, ['method', 'vlen', 'external', 'zero_dims', 'doc', 'method_domain'])
 
         dsname = dsdecl['name']
 
@@ -544,11 +544,22 @@ class HddlReader ( object ) :
         # it may specify method name via tags, argument may be QID, we need string
         method = _tagval(dsdecl, 'method', [None])[0]
         if method: method = str(method)
-
+            
         # shape can be specified as a rank only (number or None)
         rank = dsdecl['shape']
         if rank is None: rank = -1
-        
+
+        domain_for_method = None
+        if not method:
+            method_domain = _tagval(dsdecl, 'method_domain', None)
+            if method_domain:
+                assert len(method_domain)==2, "ERROR: method_domain tag requires 2 args (method, len)"
+                method = str(method_domain[0])
+                assert rank is -1, "ERROR: processing method_domain tag, but rank is not -1? unexpected"
+                rank = 1
+                domain_for_method = str(method_domain[1])
+                assert domain_for_method, "ERROR: 2nd argument for method_domain is empty"
+
         # optional schema version in tags
         schema_version = self._getIntTag(dsdecl, 'schema_version', 0)
 
@@ -559,6 +570,7 @@ class HddlReader ( object ) :
                        type = dstype,
                        method = method,
                        rank = rank,
+                       domain_for_method = domain_for_method,
                        schema_version = schema_version,
                        tags = _tags(dsdecl))
         h5type.datasets.append(ds)

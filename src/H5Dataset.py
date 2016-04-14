@@ -64,6 +64,7 @@ class H5Dataset ( object ) :
         self._type = kw.get('type', None)   # optional type
         self._mthd = kw.get('method') or self.name     # corresponding method name in pstype, default is the same as name
         self._rank = kw.get('rank', -1)     # attribute array rank, -1 if unknown
+        self._domain_for_method = kw.get('domain_for_method', None)
         self.schema_version = kw.get('schema_version', 0)      # attribute schema version
         self.attributes = []                # list of H5Attribute objects
         self.tags = kw.get('tags', {}).copy()
@@ -122,6 +123,14 @@ class H5Dataset ( object ) :
         if self._rank < 0:
             self._rank = self._method().rank
         return self._rank
+
+    @property
+    def domain_for_method(self):
+        """Get domain for method, if set"""
+        if self.attributes: return None
+        if self._domain_for_method:
+            return self._domain_for_method
+        return None
 
     @property
     def shape(self):

@@ -748,7 +748,7 @@ void store_at(const {{psanatypename}}* obj, hdf5pp::Group group, long index, int
 ::::template:::: schema_store_impl
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :
-:  Template for implementation of the store() and store_at() methods. 
+:  Template for implementation of the make_datasets(), store() and store_at() methods. 
 :
 :  Parameters for this template:
 :    hschema    - instance of SchemaType class
@@ -848,6 +848,59 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
     }
   } else {
     hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", obj->{{ds.method}}());
+  }
+{% if 'zero_dims' in ds.tags %}
+  }
+{%- endif -%}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_array_ds_method_domain
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a dataset of stacked 1D arrays
+:  where each 1D array will be filled by calling a method over a range
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetRegular type
+:      arrayLen - string that evaluates to the length of the array to create
+:
+  {
+{% if 'zero_dims' in ds.tags %}
+    if ({{arrayLen}} > 0) {
+{% endif %}
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds.type.name}}>::stored_type(), {{arrayLen}});
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+{% if 'zero_dims' in ds.tags %}
+    }
+{% endif %}
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_array_ds_method_domain
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out 1D ndarray by calling a method over a range
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetRegular type
+:
+{%- if 'zero_dims' in ds.tags %}
+  if (group.hasChild("{{ds.name}}")) {
+{% endif %}
+  if (append) {
+    if (obj) {
+      ndarray<{{ds.type.name}}, 1> {{ds.name}}_method_domain = make_ndarray<{{ds.type.name}}>({{arrayLen}});
+      for ({{methodArgType}} methodArg = 0; methodArg < {{arrayLen}}; ++methodArg) {
+        {{ds.name}}_method_domain[methodArg] = obj->{{ds.method}}(methodArg);
+      }
+      hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", {{ds.name}}_method_domain, index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+    }
+  } else {
+    ndarray<{{ds.type.name}}, 1> {{ds.name}}_method_domain = make_ndarray<{{ds.type.name}}>({{arrayLen}});
+    for ({{methodArgType}} methodArg = 0; methodArg < {{arrayLen}}; ++methodArg) {
+      {{ds.name}}_method_domain[methodArg] = obj->{{ds.method}}(methodArg);
+    }
+    hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", {{ds.name}}_method_domain);
   }
 {% if 'zero_dims' in ds.tags %}
   }
@@ -1174,6 +1227,24 @@ template <typename Config>
 {% block body %}
 {% endblock %}
 }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ds_access_method_valtype_from_1darray
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for array attribute of basic type
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    shape        - expression defining array shape (comma-separated)
+:    args         - method.args used to make the argdecl argument for super, [0][0] is used
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (m_ds_{{ds.name}}.empty()) read_ds_{{ds.name}}();
+  return m_ds_{{ds.name}}[ {{args[0][0]}} ];
+{% endblock %}
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: attr_access_method_basic
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

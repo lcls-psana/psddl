@@ -40,6 +40,7 @@ import logging
 #-----------------------------
 import jinja2 as ji
 from psddl.Enum import Enum
+from psddl.Constant import Constant
 from psddl.Template import Template as T
 from psddl.TemplateLoader import TemplateLoader
 
@@ -506,10 +507,27 @@ class DatasetRegular(object):
             else:
                 return [_TEMPL('read_regular_ds_abstract_method').render(locals())]
 
+    def _getDomainMethodArrayLen(self, domain_for_method, rank):
+        '''helper to make_ds_impl and write_ds_impl
+        '''
+        assert rank == 1, "unexpected: method_domain set but rank is not 1"
+        assert domain_for_method.startswith('@psanaobj.'), "domain_for_method=%s doesn't start with @psanaobj." % domain_for_method
+        arrayLenString = domain_for_method.split('.')[1]
+        arrayLenLookup = self.pstype.lookup(arrayLenString)
+        arrayLen = None
+        if isinstance(arrayLenLookup, Constant):
+            arrayLen = 'Psana::' + arrayLenLookup.parent.fullNameCpp() + '::' + arrayLenLookup.name
+        assert arrayLen, "method_domain handling of arrayLenLookup=%r not implemented" % arrayLenLookup
+        return arrayLen
+
     def make_ds_impl(self):
         '''Returns piece of code implementing dataset creation code'''
         ds = self.ds
         rank = ds.rank
+
+        if ds.domain_for_method:
+            arrayLen = self._getDomainMethodArrayLen(ds.domain_for_method, rank)
+            return _TEMPL('make_array_ds_method_domain').render(locals())
 
         if ds.sizeIsVlen():
             # vlen array
@@ -539,6 +557,15 @@ class DatasetRegular(object):
         '''Returns piece of code implementing writing of the data to a dataset'''
         ds = self.ds
         rank = ds.rank
+
+        if ds.domain_for_method:
+            arrayLen = self._getDomainMethodArrayLen(ds.domain_for_method, rank)
+            method = self.pstype.lookup(ds.method)
+            assert len(method.args)==1, "method_domain: specified method: %s does not have 1 arg. args=%s" % (method, method.args)
+            methodArg = method.args[0]
+            assert len(methodArg)==2, "method_domain: method %s has one arg, but expected 2-tuple, got %s" % (method, methodArg)
+            methodArgType = methodArg[1].name
+            return _TEMPL('write_array_ds_method_domain').render(locals())
 
         if ds.sizeIsVlen():
             if ds.type.basic:
@@ -641,7 +668,7 @@ class SchemaValueType(SchemaType):
         
 class SchemaAbstractType(SchemaType):
     '''
-    All stuff needed for generation of code for value-types.
+    All stuff needed for generation of code for abstract-types.
     '''
     def __init__(self, schema, psana_ns):
         '''schema parameter is of type H5Type'''
@@ -821,7 +848,6 @@ class SchemaAbstractType(SchemaType):
                     else:
                         shape = _interpolate(str(attr.shape), type)
                     impl = _TEMPL('attr_access_method_array_valtype').render(locals())
-                    
                 else:
                     
                     # array of non-basic abstract type, have to convert
@@ -848,7 +874,10 @@ class SchemaAbstractType(SchemaType):
             ret_type = ds_type
             rank = ds.rank
             if rank:
-                if ds.type.name == 'char':
+                if 'method_domain' in ds.tags:
+                    assert rank==1, "method_domain but rank != 1"
+                    args = meth.args
+                elif ds.type.name == 'char':
                     ret_type = "const char*"
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(rank-1)]
                 elif ds.type.basic or ds.type.value_type:
@@ -886,12 +915,15 @@ class SchemaAbstractType(SchemaType):
                 # non-zero rank, stored as a dataset
 
                 if ds.type.value_type and not isinstance(ds.type, Enum):
-
-                    # array of value type, have to convert
-                    impl = _TEMPL('ds_access_method_array_valtype').render(locals())
+                    if 'method_domain' in ds.tags:
+                        impl = _TEMPL('ds_access_method_valtype_from_1darray').render(locals())
+                    else:
+                        # array of value type, have to convert
+                        impl = _TEMPL('ds_access_method_array_valtype').render(locals())
                     
                 else:
-                    
+
+                    assert 'method_domain' not in ds.tags, "method_domain over non basic type or enum not implemented"
                     # array of non-basic abstract type, have to convert
                     arguse = ''.join(["[%s]" % arg for arg, _ in args])
                     ds_class = ds.h5schema().className()

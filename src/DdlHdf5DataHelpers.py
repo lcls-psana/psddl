@@ -41,6 +41,7 @@ import logging
 import jinja2 as ji
 from psddl.Enum import Enum
 from psddl.Constant import Constant
+from psddl.Attribute import Attribute
 from psddl.Template import Template as T
 from psddl.TemplateLoader import TemplateLoader
 
@@ -507,7 +508,7 @@ class DatasetRegular(object):
             else:
                 return [_TEMPL('read_regular_ds_abstract_method').render(locals())]
 
-    def _getDomainMethodArrayLen(self, domain_for_method, rank):
+    def _getDomainMethodArrayLen(self, domain_for_method, rank, context):
         '''helper to make_ds_impl and write_ds_impl
         '''
         assert rank == 1, "unexpected: method_domain set but rank is not 1"
@@ -517,6 +518,22 @@ class DatasetRegular(object):
         arrayLen = None
         if isinstance(arrayLenLookup, Constant):
             arrayLen = 'Psana::' + arrayLenLookup.parent.fullNameCpp() + '::' + arrayLenLookup.name
+        elif isinstance(arrayLenLookup, Attribute):
+            assert arrayLenLookup.parent == self.pstype, "method_domain: arrayLenLookup " + \
+                "is attribute, but not to type for which schema is being developed."
+            if arrayLenLookup.accessor:
+                if context in ['make_ds_impl', 'ref']:
+                    arrayLen = "obj." + arrayLenLookup.accessor.name + "()";
+                elif context in ['ds_write_impl', 'pointer']:
+                    arrayLen = "obj->" + arrayLenLookup.accessor.name + "()";
+                else:
+                    raise Exception(("unknown value of context=%s " + \
+                                     "in call to _getDomainMethodArrayLen. " + \
+                                     "domain is specified by attribute of psanaobject. " + \
+                                     "Generated code may need pointer or reference " + \
+                                     "depending on context") % context)
+            else:
+                arrayLen = "obj." + arrayLenLookup.name;            
         assert arrayLen, "method_domain handling of arrayLenLookup=%r not implemented" % arrayLenLookup
         return arrayLen
 
@@ -526,7 +543,7 @@ class DatasetRegular(object):
         rank = ds.rank
 
         if ds.domain_for_method:
-            arrayLen = self._getDomainMethodArrayLen(ds.domain_for_method, rank)
+            arrayLen = self._getDomainMethodArrayLen(ds.domain_for_method, rank, context='make_ds_impl')
             return _TEMPL('make_array_ds_method_domain').render(locals())
 
         if ds.sizeIsVlen():
@@ -559,7 +576,7 @@ class DatasetRegular(object):
         rank = ds.rank
 
         if ds.domain_for_method:
-            arrayLen = self._getDomainMethodArrayLen(ds.domain_for_method, rank)
+            arrayLen = self._getDomainMethodArrayLen(ds.domain_for_method, rank, context='ds_write_impl')
             method = self.pstype.lookup(ds.method)
             assert len(method.args)==1, "method_domain: specified method: %s does not have 1 arg. args=%s" % (method, method.args)
             methodArg = method.args[0]

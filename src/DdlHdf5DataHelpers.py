@@ -42,6 +42,7 @@ import jinja2 as ji
 from psddl.Enum import Enum
 from psddl.Constant import Constant
 from psddl.Attribute import Attribute
+from psddl.Method import Method
 from psddl.Template import Template as T
 from psddl.TemplateLoader import TemplateLoader
 
@@ -511,6 +512,34 @@ class DatasetRegular(object):
     def _getDomainMethodArrayLen(self, domain_for_method, rank, context):
         '''helper to make_ds_impl and write_ds_impl
         '''
+        def attribute_or_method_accessor_name(arrayLenLookup):
+            if isinstance(arrayLenLookup, Attribute):
+                return arrayLenLookup.accessor.name
+            elif isinstance(arrayLenLookup, Method):
+                return arrayLenLookup.name
+            raise Exception("only call for Attribute or Method, %s.%s.%s is neither" %
+                            (arrayLenLookup.parent.parent.name,
+                             arrayLenLookup.parent.name,
+                             arrayLenLookup.name))
+
+        def attribute_or_method_has_accessor(arrayLenLookup):
+            if isinstance(arrayLenLookup, Attribute):
+                if arrayLenLookup.accessor:
+                    return True
+                return False
+            elif isinstance(arrayLenLookup, Method):
+                if len(arrayLenLookup.args)==0:
+                    return True
+                raise Exception("error with method_domain: "
+                                "the arrayLen is specified with a method of the type "
+                                "that takes arguments. method=%s, type=%s.%s" % 
+                                (arrayLenLookup.name, arrayLenLookup.parent.parent.name,
+                                 arranLenLookup.parent.name))
+            raise Exception("only call this helper on attribute or method. For this=%s.%s.%s type=%s" %
+                            (arrayLenLookup.parent.parent.name,
+                             arrayLenLookup.parent.name,
+                             arrayLenLookup.name, type(arrayLenLookup)))
+                
         assert rank == 1, "unexpected: method_domain set but rank is not 1"
         assert domain_for_method.startswith('@psanaobj.'), "domain_for_method=%s doesn't start with @psanaobj." % domain_for_method
         arrayLenString = domain_for_method.split('.')[1]
@@ -518,22 +547,21 @@ class DatasetRegular(object):
         arrayLen = None
         if isinstance(arrayLenLookup, Constant):
             arrayLen = 'Psana::' + arrayLenLookup.parent.fullNameCpp() + '::' + arrayLenLookup.name
-        elif isinstance(arrayLenLookup, Attribute):
+        elif isinstance(arrayLenLookup, Attribute) or isinstance(arrayLenLookup, Method):
             assert arrayLenLookup.parent == self.pstype, "method_domain: arrayLenLookup " + \
-                "is attribute, but not to type for which schema is being developed."
-            if arrayLenLookup.accessor:
+                "is attribute or method, but not to type for which schema is being developed."
+            if attribute_or_method_has_accessor(arrayLenLookup):
                 if context in ['make_ds_impl', 'ref']:
-                    arrayLen = "obj." + arrayLenLookup.accessor.name + "()";
+                    arrayLen = "obj." + attribute_or_method_accessor_name(arrayLenLookup)  + "()";
                 elif context in ['ds_write_impl', 'pointer']:
-                    arrayLen = "obj->" + arrayLenLookup.accessor.name + "()";
+                    arrayLen = "obj->" + attribute_or_method_accessor_name(arrayLenLookup) + "()";
                 else:
                     raise Exception(("unknown value of context=%s " + \
                                      "in call to _getDomainMethodArrayLen. " + \
                                      "domain is specified by attribute of psanaobject. " + \
                                      "Generated code may need pointer or reference " + \
                                      "depending on context") % context)
-            else:
-                arrayLen = "obj." + arrayLenLookup.name;            
+
         assert arrayLen, "method_domain handling of arrayLenLookup=%r not implemented" % arrayLenLookup
         return arrayLen
 

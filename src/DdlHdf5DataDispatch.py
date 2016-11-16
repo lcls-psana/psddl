@@ -44,7 +44,7 @@ import types
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import jinja2 as ji
+from psddl.JinjaEnvironment import getJinjaEnvironment
 from psddl.H5Type import H5Type
 from psddl.Package import Package
 from psddl.Type import Type
@@ -77,8 +77,7 @@ _extra_headers = [
 # ========================================================
 
 # jinja environment
-_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
-                       line_statement_prefix='$', line_comment_prefix='$$')
+_jenv = getJinjaEnvironment()
 
 def _TEMPL(template):
     return _jenv.get_template('hdf5.tmpl?'+template)

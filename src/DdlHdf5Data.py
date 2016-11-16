@@ -44,7 +44,7 @@ import os
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import jinja2 as ji
+from psddl.JinjaEnvironment import getJinjaEnvironment
 from psddl.Attribute import Attribute
 from psddl.Enum import Enum
 from psddl.Package import Package
@@ -53,7 +53,6 @@ from psddl.H5Type import H5Type
 from psddl.H5Dataset import H5Dataset
 from psddl.H5Attribute import H5Attribute
 from psddl.Template import Template as T
-from psddl.TemplateLoader import TemplateLoader
 from psddl import DdlHdf5DataHelpers as Helpers
 
 #----------------------------------
@@ -61,8 +60,7 @@ from psddl import DdlHdf5DataHelpers as Helpers
 #----------------------------------
 
 # jinja environment
-_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
-                       line_statement_prefix='$', line_comment_prefix='$$')
+_jenv = getJinjaEnvironment()
 
 def _TEMPL(template):
     return _jenv.get_template('hdf5.tmpl?'+template)

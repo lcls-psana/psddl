@@ -40,19 +40,17 @@ import types
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import jinja2 as ji
+from psddl.JinjaEnvironment import getJinjaEnvironment
 from psddl.CppTypeCodegen import CppTypeCodegen
 from psddl.Package import Package
 from psddl.Type import Type
-from psddl.TemplateLoader import TemplateLoader
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
 
 # jinja environment
-_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
-                       line_statement_prefix='$', line_comment_prefix='$$')
+_jenv = getJinjaEnvironment()
 
 def _TEMPL(template):
     return _jenv.get_template('cppcodegen.tmpl?'+template)

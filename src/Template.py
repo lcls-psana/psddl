@@ -71,7 +71,7 @@ class Template(string.Template) :
     equivalent to:
 
       res = Template("$name -> $code").substitute(object.__dict__)
-      
+
     """
 
     #----------------

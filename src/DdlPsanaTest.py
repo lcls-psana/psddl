@@ -37,8 +37,7 @@ import os
 #--------------------------------
 #  Imports of other modules --
 #--------------------------------
-import jinja2 as ji
-from psddl.TemplateLoader import TemplateLoader
+from psddl.JinjaEnvironment import getJinjaEnvironment
 from collections import defaultdict
 import psddl
 
@@ -64,12 +63,8 @@ class DdlPsanaTest ( object ) :
     self.log = appBaseArg
     self.packageDir = backend_options['package_dir']
     assert os.path.exists(self.packageDir), "package dir %s does not exist" % self.packageDir
-    self.jiEnv = ji.Environment(loader=TemplateLoader(package='psana_test',
-                                                      templateSubDir='templates',
-                                                      ), 
-                                trim_blocks=True,
-                                line_statement_prefix='$',
-                                line_comment_prefix='$$')
+    self.jiEnv = getJinjaEnvironment(package='psana_test',
+                                     templateSubDir='templates')
   #-------------------
   #  Public methods --
   #-------------------

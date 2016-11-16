@@ -40,20 +40,18 @@ import types
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import jinja2 as ji
 from psddl.CppTypeCodegen import CppTypeCodegen
 from psddl.Package import Package
 from psddl.Type import Type
 from psddl.Template import Template as T
-from psddl.TemplateLoader import TemplateLoader
+from psddl.JinjaEnvironment import getJinjaEnvironment
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
 
 # jinja environment
-_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
-                       line_statement_prefix='$', line_comment_prefix='$$')
+_jenv = getJinjaEnvironment()
 
 def _TEMPL(template):
     return _jenv.get_template('cppcodegen.tmpl?'+template)
@@ -123,6 +121,10 @@ class DdlPsanaInterfaces ( object ) :
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
         print >>self.cpp, "#include \"%s\"" % inc
         print >>self.cpp, "#include <iostream>"
+
+#        import IPython
+#        IPython.embed()
+#        1/0
 
         # headers for other included packages
         for use in model.use:

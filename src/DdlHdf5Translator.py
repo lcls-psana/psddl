@@ -37,8 +37,7 @@ import copy
 #--------------------------------
 #  Imports of other modules --
 #--------------------------------
-import jinja2 as ji
-from psddl.TemplateLoader import TemplateLoader
+from psddl.JinjaEnvironment import getJinjaEnvironment
 
 def getAliasAndGroupingTerm(s,endStrings):
   '''used to group together similar xtc type names
@@ -279,11 +278,8 @@ class DdlHdf5Translator ( object ) :
             
         self.log = appBaseArg
         self.packageDir = backend_options['package_dir']
-        self.jiEnv = ji.Environment(loader=TemplateLoader(package='Translator',
-                                                          templateSubDir='templates'), 
-                                    trim_blocks=True,
-                                    line_statement_prefix='$',
-                                    line_comment_prefix='$$')
+        self.jiEnv = getJinjaEnvironment(package='Translator',
+                                         templateSubDir='templates')
     #-------------------
     #  Public methods --
     #-------------------

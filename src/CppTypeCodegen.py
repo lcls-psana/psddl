@@ -40,21 +40,18 @@ import types
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import jinja2 as ji
 from psddl.Attribute import Attribute
 from psddl.ExprVal import ExprVal
 from psddl.Method import Method
 from psddl.Enum import Enum
 from psddl.Type import Type
 from psddl.Template import Template as T
-from psddl.TemplateLoader import TemplateLoader
-
+from psddl.JinjaEnvironment import getJinjaEnvironment
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
 # jinja environment
-_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
-                       line_statement_prefix='$', line_comment_prefix='$$')
+_jenv = getJinjaEnvironment()
 
 def _TEMPL(template):
     return _jenv.get_template('cppcodegen.tmpl?'+template)

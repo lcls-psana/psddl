@@ -41,11 +41,10 @@ import collections
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import jinja2 as ji
 from psddl.Package import Package
 from psddl.Type import Type
 from psddl.Template import Template as T
-from psddl.TemplateLoader import TemplateLoader
+from psddl.JinjaEnvironment import getJinjaEnvironment
 
 #----------------------------------
 # Local non-exported definitions --
@@ -128,8 +127,7 @@ def _proxyClass(type, psana_type, final_type, xtc_type, config_type=None):
             return 'EvtProxyCfg<{0}, {1}, {2}, {3}>'.format(psana_type, final_type, xtc_type, config_type)
 
 # jinja environment
-_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
-                       line_statement_prefix='$', line_comment_prefix='$$')
+_jenv = getJinjaEnvironment()
 
 def _TEMPL(template):
     return _jenv.get_template('pds2psana_dispatch.tmpl?'+template)

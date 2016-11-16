@@ -71,19 +71,24 @@ class TemplateLoader(ji.FileSystemLoader):
         ARGS:
         templateSubdir -  a subdirectory to the data directory of the 
         package.
+
+        Due to an issue with jinja 2.8, we cache the templates ourselve, we
+        expect the environment to be created with a cache_size of 0
         '''
         self.package=package
         self.templateSubDir=templateSubDir
         path = os.environ['SIT_DATA'].split(':')
         ji.FileSystemLoader.__init__(self, path)
 
-
+        self.template_cache={}
     #-------------------
     #  Public methods --
     #-------------------
 
     def get_source(self, environment, template):
-
+        if template in self.template_cache:
+            return self.template_cache[template]
+        orig_template_name = template
         # template name is the file name followed by "?template"
         fname, template = template.split('?')
 
@@ -107,7 +112,8 @@ class TemplateLoader(ji.FileSystemLoader):
                 pass
             elif collect: 
                 tmpl.append(line)
-                
+        templateSource = ''.join(tmpl)
+        self.template_cache[orig_template_name] = (templateSource, path, helper)
         return ''.join(tmpl), path, helper
 
     #--------------------------------

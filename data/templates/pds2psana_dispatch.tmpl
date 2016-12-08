@@ -208,6 +208,8 @@ $ endif
             typedef {{proxy_type}} ProxyType;
             if (evt) evt->putProxy<{{psana_type}}>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
 $ endfor
+          } else {
+            MsgLog("xtcDispatch", trace, "not storing {{psana_type}} in event because no config object found");
           }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: typeinfoptrs

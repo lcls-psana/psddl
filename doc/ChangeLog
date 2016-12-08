@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-25
+2016-12-7 David Schneider
+Generate trace message if config object not found and event data not stored
+
 Tag: V00-13-24
 2016-11-16 David Schneider
 Turn off Environment caching to work around issue with jinja2 2.8 JIRA PSRT-71 

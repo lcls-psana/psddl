@@ -268,9 +268,9 @@ class HddlReader ( object ) :
             parent = None
             self._parsePackage(tree, model, parent, included)
                 
-        except EOFError, ex:
+        except EOFError as ex:
             raise
-        except SyntaxError, ex:
+        except SyntaxError as ex:
             print(ex, file=sys.stderr)
             for loc in reversed(self.location[:-1]):
                 print("    included from:", loc, file=sys.stderr)

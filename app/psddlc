@@ -188,11 +188,11 @@ class psddlc ( AppBase ) :
             else:
                 reader = HddlReader(self._args, self._options.include_dir, self._options.parse_devel)
             model = reader.read()
-        except EOFError, ex:
+        except EOFError as ex:
             # if parser throws this error means it has already printed as much 
             # info as possible and we should just stop with error
             return 2
-        except Exception, ex:
+        except Exception as ex:
             print("parsing failed for file", self._args, file=sys.stderr)
             print(ex, file=sys.stderr)
             raise
@@ -200,7 +200,7 @@ class psddlc ( AppBase ) :
 
         try :
             generator.parseTree(model)
-        except Exception, ex:
+        except Exception as ex:
             print("generation failed for file", self._args, file=sys.stderr)
             print("reason:", ex, file=sys.stderr)
             raise

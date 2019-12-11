@@ -316,7 +316,7 @@ class DatasetCompound(object):
                     conversion = pstype.fullName('C++', self.psana_ns)
                     cvt_args = ', '.join(dsattrs)
 
-        except Exception, ex:
+        except Exception as ex:
             # if we fail just ignore it
             _log.debug('_genDs: exception for conv operator: %s', ex)
 

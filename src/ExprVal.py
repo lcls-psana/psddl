@@ -30,7 +30,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
-import types
+import six
 import operator
 
 #---------------------------------
@@ -66,7 +66,7 @@ class ExprVal ( object ) :
             # copy constructor
             self.value = val.value
             self.const = val.const
-        elif type(val) == types.IntType: 
+        elif type(val) == int: 
             # integer value is constant
             self.value = val
             self.const = True
@@ -104,11 +104,12 @@ class ExprVal ( object ) :
         if other.value is None: return None
         
         # if any of them is string then do string expression
-        if isinstance(self.value, types.StringType) and isinstance(other.value, types.StringType):
+        if (isinstance(self.value, six.binary_type) or isinstance(self.value, six.text_type)) and \
+	        (isinstance(other.value, six.binary_type) or isinstance(other.value, six.text_type)):
             return "(%s)%s(%s)" % (self.value, strop, other.value)
-        if isinstance(self.value, types.StringType):
+        if isinstance(self.value, six.binary_type) or isinstance(self.value, six.text_type):
             return "(%s)%s%s" % (self.value, strop, other.value)
-        if isinstance(other.value, types.StringType):
+        if isinstance(other.value, six.binary_type) or isinstance(other.value, six.text_type):
             return "%s%s(%s)" % (self.value, strop, other.value)
 
         # otherwise do a regular operator

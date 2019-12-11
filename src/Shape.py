@@ -27,6 +27,7 @@ __version__ = "$Revision$"
 import sys
 import types
 import operator
+from functools import reduce
 
 #---------------------------------
 #  Imports of base class module --

@@ -32,7 +32,7 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import logging
-import types
+import six
 
 #---------------------------------
 #  Imports of base class module --
@@ -75,7 +75,7 @@ def _typename(type):
     return type.fullName('C++')
 
 def _typedecl(type):
-    if isinstance(type, types.StringTypes): return type
+    if isinstance(type, six.binary_type) or isinstance(type, six.text_type): return type
     typename = _typename(type)
     if not type.basic : typename = "const "+typename+'&'
     return typename

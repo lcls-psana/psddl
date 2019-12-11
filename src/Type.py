@@ -31,7 +31,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import logging
-import types
 
 #---------------------------------
 #  Imports of base class module --
@@ -175,7 +174,7 @@ class Type ( Namespace ) :
                 
                 # need to calculate offset for this attribute
             
-                if type(offset.value) == types.IntType:
+                if type(offset.value) == int:
                 
                     # no explicit offset - use implicit but check alignment
                     align = attr.align()
@@ -202,7 +201,7 @@ class Type ( Namespace ) :
 
                 # attribute already has an offset defined
 
-                if type(attr.offset) is types.IntType and type(offset.value) is types.IntType:
+                if type(attr.offset) is int and type(offset.value) is int:
                     
                     if attr.offset < offset.value :
                         logging.error('offset specification mismatch for %s.%s', self.name, attr.name)
@@ -242,7 +241,7 @@ class Type ( Namespace ) :
         logging.debug('_calcOffsets: type=%r size = %s', self, self.size)
         if self.size:
             # size was already pre-defined
-            if type(self.size) is types.IntType and type(offset.value) is types.IntType:
+            if type(self.size) is int and type(offset.value) is int:
                 if self.size != offset.value :
                     logging.error('object size mismatch for %s', self.name)
                     logging.error('implicit size = %d, explicit size = %d', offset, self.size)

@@ -19,6 +19,7 @@ part of it, please give an appropriate acknowledgement.
 
 @author Andrei Salnikov
 """
+from __future__ import print_function
 
 #------------------------------
 #  Module's version from CVS --
@@ -134,7 +135,7 @@ class psddlc ( AppBase ) :
     def _run ( self ) :
 
         if self._options.list_backends:
-            print "Available backends: " + " ".join(sorted(self.backends.keys()))
+            print("Available backends: " + " ".join(sorted(self.backends.keys())))
             return 0
 
         # build dict with backend options
@@ -145,17 +146,17 @@ class psddlc ( AppBase ) :
         
         # maybe all we need is a help with backend options
         if 'help' in backend_options:
-            print 'Options defined by backends, if backend name is not in the list then it does not have options:'
+            print('Options defined by backends, if backend name is not in the list then it does not have options:')
             for be in sorted(self.backends.keys()):
                 factory = self.backends[be]
                 be_options = factory.backendOptions()
                 if be_options:
-                    print "\n  '{0}' backend:".format(be)
+                    print("\n  '{0}' backend:".format(be))
                     lenopt = max([len(option) for option, typ, descr in be_options])
                     lentyp = max([len(typ) for option, typ, descr in be_options])
                     fmt = "    {{0:{0}s}}  {{1:{1}s}}  {{2}}".format(lenopt, lentyp)
                     for option, typ, descr in be_options:
-                        print fmt.format(option, typ, descr)
+                        print(fmt.format(option, typ, descr))
             return 0
 
         # rest of the code needs an input data
@@ -177,7 +178,7 @@ class psddlc ( AppBase ) :
         try:
             factory = self.backends[self._options.backend]
         except:
-            print >>sys.stderr, "incorrect back-end name:", self._options.backend
+            print("incorrect back-end name:", self._options.backend, file=sys.stderr)
             return 2
         generator = factory(backend_options, self)
         
@@ -192,16 +193,16 @@ class psddlc ( AppBase ) :
             # info as possible and we should just stop with error
             return 2
         except Exception, ex:
-            print >>sys.stderr, "parsing failed for file", self._args
-            print >>sys.stderr, ex
+            print("parsing failed for file", self._args, file=sys.stderr)
+            print(ex, file=sys.stderr)
             raise
             return 2
 
         try :
             generator.parseTree(model)
         except Exception, ex:
-            print >>sys.stderr, "generation failed for file", self._args
-            print >>sys.stderr, "reason:", ex
+            print("generation failed for file", self._args, file=sys.stderr)
+            print("reason:", ex, file=sys.stderr)
             raise
             return 2
 

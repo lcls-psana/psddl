@@ -16,6 +16,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andy Salnikov
 """
+from __future__ import print_function
 
 
 #------------------------------
@@ -270,9 +271,9 @@ class HddlReader ( object ) :
         except EOFError, ex:
             raise
         except SyntaxError, ex:
-            print >>sys.stderr, ex
+            print(ex, file=sys.stderr)
             for loc in reversed(self.location[:-1]):
-                print >>sys.stderr, "    included from:", loc
+                print("    included from:", loc, file=sys.stderr)
             # special type of exception will stop processing
             raise EOFError
                 
@@ -1004,7 +1005,7 @@ class HddlReader ( object ) :
                 cfgtype = pkg.lookup(str(cfg), Type)
                 if not cfgtype:
                     if not self.parseDevelTypes and self._isDevelType(str(cfg), pkg):
-                        print >>sys.stderr, "Warning: %s type=%s, DEVEL type=%s in config list is being omitted" % (pkg, typedict['name'], cfg)
+                        print("Warning: %s type=%s, DEVEL type=%s in config list is being omitted" % (pkg, typedict['name'], cfg), file=sys.stderr)
                         continue
                     msg = "Failed to resolve name of a config type '{0}'".format(cfg)
                     raise _error(self.location[-1], _lineno(tag), msg)

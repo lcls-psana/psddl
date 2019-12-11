@@ -22,6 +22,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andrei Salnikov
 """
+from __future__ import print_function
 
 
 #------------------------------
@@ -229,8 +230,8 @@ class DdlHdf5DataDispatch ( object ) :
 
         inc_guard = self.guard
         namespace = self.top_pkg
-        print >>self.inc, _TEMPL('dispatch_header_file').render(locals())
-        print >>self.cpp, _TEMPL('dispatch_impl_file').render(locals())
+        print(_TEMPL('dispatch_header_file').render(locals()), file=self.inc)
+        print(_TEMPL('dispatch_impl_file').render(locals()), file=self.cpp)
         
         # close all files
         self.inc.close()

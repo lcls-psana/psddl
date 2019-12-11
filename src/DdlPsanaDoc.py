@@ -18,6 +18,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andy Salnikov
 """
+from __future__ import print_function
 
 
 #------------------------------
@@ -191,21 +192,21 @@ class DdlPsanaDoc ( object ) :
 
         packages = self.packages(ns)
         if packages:
-            print >>out, '<h2>Packages/namespaces</h2><ul>'
+            print('<h2>Packages/namespaces</h2><ul>', file=out)
             for pkg in packages :
                 href = _esc(self._pkgFileName(pkg))
                 name = _esc(pkg.fullName('C++',self.top_pkg))
-                print >>out, T('<li><a href="$href">$name</a></li>')(locals())
-            print >>out, '</ul>'
+                print(T('<li><a href="$href">$name</a></li>')(locals()), file=out)
+            print('</ul>', file=out)
 
     def printTypes(self, ns, out):
 
         types = self.types(ns)
         if types:
-            print >>out, '<h2>Types/classes</h2><ul>'
+            print('<h2>Types/classes</h2><ul>', file=out)
             for type in types :
-                print >>out, T('<li>$ref</li>')(ref=self._typeRef(type))
-            print >>out, '</ul>'
+                print(T('<li>$ref</li>')(ref=self._typeRef(type)), file=out)
+            print('</ul>', file=out)
 
     def printConstants(self, ns, out):
 
@@ -222,46 +223,46 @@ class DdlPsanaDoc ( object ) :
                 constants.insert(0, c)
         
         if constants:
-            print >>out, '<h2>Constants</h2>'
+            print('<h2>Constants</h2>', file=out)
             for const in constants:
-                print >>out, T('<div class="descr"><div class="def">$name = $value</div>$comment</div>')\
-                        (_esc(const.__dict__))
+                print(T('<div class="descr"><div class="def">$name = $value</div>$comment</div>')\
+                        (_esc(const.__dict__)), file=out)
 
 
     def printEnum(self, enum, out):
         
         
-        print >>out, T('<div class="descr"><div class="def" id="enum_$name">')[enum]
-        print >>out, T('Enumeration <font class="enumname">$name</font>')(name=_esc(enum.fullName('C++',self.top_pkg)))
-        print >>out, '</div>'
-        print >>out, T("<p>$comment</p>")(_esc(enum.__dict__))
-        print >>out, "<p>Enumerators:<table>"
+        print(T('<div class="descr"><div class="def" id="enum_$name">')[enum], file=out)
+        print(T('Enumeration <font class="enumname">$name</font>')(name=_esc(enum.fullName('C++',self.top_pkg))), file=out)
+        print('</div>', file=out)
+        print(T("<p>$comment</p>")(_esc(enum.__dict__)), file=out)
+        print("<p>Enumerators:<table>", file=out)
         for const in enum.constants() :
-            print >>out, '<tr>'
+            print('<tr>', file=out)
             val = ""
             if const.value is not None : val = " = " + const.value
-            print >>out, T('<td class="const">$name</td>')(_esc(const.__dict__))
-            print >>out, T('<td class="const">$value</td>')(value=_esc(val))
-            print >>out, T('<td>$comment</td>')(_esc(const.__dict__))
-            print >>out, '</tr>'
-        print >>out, "</table></p>"
-        print >>out, '</div>'
+            print(T('<td class="const">$name</td>')(_esc(const.__dict__)), file=out)
+            print(T('<td class="const">$value</td>')(value=_esc(val)), file=out)
+            print(T('<td>$comment</td>')(_esc(const.__dict__)), file=out)
+            print('</tr>', file=out)
+        print("</table></p>", file=out)
+        print('</div>', file=out)
 
     def printEnums(self, ns, out):
 
         enums = ns.enums()
         if enums:
-            print >>out, '<h2>Enumeration types</h2><dl>'
+            print('<h2>Enumeration types</h2><dl>', file=out)
             for enum in enums:
                 self.printEnum(enum, out)
-            print >>out, '</dl>'
+            print('</dl>', file=out)
 
     def parseTree ( self, model ) :
         
         # open output file
         out = file(os.path.join(self.dir, "index.html"), "w")
         self._htmlHeader(out, "Psana Data Interfaces Reference")
-        print >>out, '<h1>Psana Data Interfaces Reference</h1>'
+        print('<h1>Psana Data Interfaces Reference</h1>', file=out)
         
         self.printPackages(model, out)
 
@@ -292,9 +293,9 @@ class DdlPsanaDoc ( object ) :
         # open output file
         out = file(os.path.join(self.dir, filename), "w")
         self._htmlHeader(out, T("Package $name Reference")(name=_esc(pkgname)))
-        print >>out, T('<h1>Package $name Reference</h1>')(name=_esc(pkgname))
+        print(T('<h1>Package $name Reference</h1>')(name=_esc(pkgname)), file=out)
 
-        print >>out, _esc(pkg.comment)
+        print(_esc(pkg.comment), file=out)
 
 
         self.printPackages(pkg, out)
@@ -322,20 +323,20 @@ class DdlPsanaDoc ( object ) :
         # open output file
         out = file(os.path.join(self.dir, filename), "w")
         self._htmlHeader(out, T("Class $name Reference")(name=_esc(typename)))
-        print >>out, T('<h1>Class $name Reference</h1>')(name=_esc(typename))
+        print(T('<h1>Class $name Reference</h1>')(name=_esc(typename)), file=out)
 
         if type.location:
             include = os.path.basename(type.location)
             include = os.path.splitext(include)[0] + '.h'
             repourl = T("https://pswww.slac.stanford.edu/trac/psdm/browser/psdm/$package/trunk/include/$header")\
                     (package=self.psana_inc, header=include)
-            print >>out, T('<p>Include: <span class="code">#include "<a href="$href">$package/$header</a>"</span></p>')\
-                    (href=repourl, package=_esc(self.psana_inc), header=_esc(include))
+            print(T('<p>Include: <span class="code">#include "<a href="$href">$package/$header</a>"</span></p>')\
+                    (href=repourl, package=_esc(self.psana_inc), header=_esc(include)), file=out)
 
         if type.base:
-            print >>out, T("<p>Base class: $base</p>")(base=self._typeRef(type.base))
+            print(T("<p>Base class: $base</p>")(base=self._typeRef(type.base)), file=out)
 
-        print >>out, _esc(type.comment)
+        print(_esc(type.comment), file=out)
             
 
         self.printConstants(type, out)
@@ -363,19 +364,19 @@ class DdlPsanaDoc ( object ) :
         
         if mlist:
             
-            print >>out, '<h2>Member Functions</h2>'
-            print >>out, '<div class="descr">'
-            print >>out, '<table class="methods">'
+            print('<h2>Member Functions</h2>', file=out)
+            print('<div class="descr">', file=out)
+            print('<table class="methods">', file=out)
             
             for meth in mlist:
-                print >>out, self._methDecl(*meth)
-            print >>out, '</table></div>'            
+                print(self._methDecl(*meth), file=out)
+            print('</table></div>', file=out)            
 
-            print >>out, '<h2>Member Functions Reference</h2>'
+            print('<h2>Member Functions Reference</h2>', file=out)
             
             for meth in mlist:
-                print >>out, T('<div class="descr"><div class="def" id="meth_$name">$decl</div>$descr</div>')\
-                        (name=meth[0], decl=self._methDecl2(*meth), descr=_esc(meth[3]))
+                print(T('<div class="descr"><div class="def" id="meth_$name">$decl</div>$descr</div>')\
+                        (name=meth[0], decl=self._methDecl2(*meth), descr=_esc(meth[3])), file=out)
         
 
         self._htmlFooter(out)
@@ -455,15 +456,15 @@ class DdlPsanaDoc ( object ) :
 
     def _htmlHeader(self, f, title):
         
-        print >>f, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
-        print >>f, '<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">'
-        print >>f, T('<title>$title</title>')(locals())
-        print >>f, T('<link href="$href" rel="stylesheet" type="text/css">')(href=_css_file)
-        print >>f, '</head><body>'
+        print('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">', file=f)
+        print('<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">', file=f)
+        print(T('<title>$title</title>')(locals()), file=f)
+        print(T('<link href="$href" rel="stylesheet" type="text/css">')(href=_css_file), file=f)
+        print('</head><body>', file=f)
 
     def _htmlFooter(self, f):
         
-        print >>f, '</body></html>'
+        print('</body></html>', file=f)
 
     def _pkgFileName(self, pkg):
 

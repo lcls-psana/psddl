@@ -18,6 +18,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andrei Salnikov
 """
+from __future__ import print_function
 
 
 #------------------------------
@@ -129,36 +130,36 @@ class CppTypeCodegen ( object ) :
         logging.debug("CppTypeCodegen.codegen: type=%s", repr(self._type))
 
         # class-level comment
-        print >>self._inc, T("\n/** @class $name\n\n  $comment\n*/\n")[self._type]
+        print(T("\n/** @class $name\n\n  $comment\n*/\n")[self._type], file=self._inc)
 
         # declare config classes if needed
         for cfg in self._type.xtcConfig:
             # only add declaration for the types from the same namespace, declaring 
             # classes from other namespaces cannot be done at this point
             if cfg.parent is self._type.parent:
-                print >>self._inc, T("class $name;")[cfg]
+                print(T("class $name;")[cfg], file=self._inc)
 
         # for non-abstract types C++ may need pack pragma
         needPragmaPack = self._pdsdata and self._type.pack
         if needPragmaPack : 
-            print >>self._inc, T("#pragma pack(push,$pack)")[self._type]
+            print(T("#pragma pack(push,$pack)")[self._type], file=self._inc)
 
         # base class
         base = ""
         if self._type.base : base = T(": public $name")[self._type.base]
 
         # start class declaration
-        print >>self._inc, T("\nclass $name$base {")(name = self._type.name, base = base)
+        print(T("\nclass $name$base {")(name = self._type.name, base = base), file=self._inc)
         access = "private"
 
         # enums for version and typeId
         access = self._access("public", access)
         if self._type.type_id is not None: 
             doc = '/**< XTC type ID value (from Pds::TypeId class) */'
-            print >>self._inc, T("  enum { TypeId = Pds::TypeId::$type_id $doc };")(type_id=self._type.type_id, doc=doc)
+            print(T("  enum { TypeId = Pds::TypeId::$type_id $doc };")(type_id=self._type.type_id, doc=doc), file=self._inc)
         if self._type.version is not None: 
             doc = '/**< XTC type version number */'
-            print >>self._inc, T("  enum { Version = $version $doc };")(version=self._type.version, doc=doc)
+            print(T("  enum { Version = $version $doc };")(version=self._type.version, doc=doc), file=self._inc)
 
         # enums for constants
         access = self._access("public", access)
@@ -180,25 +181,25 @@ class CppTypeCodegen ( object ) :
             if not defCtor:
                 # generate default constructor anyway
                 access = self._access('public', access)
-                print >>self._inc, T("  $name() {}")[self._type]
+                print(T("  $name() {}")[self._type], file=self._inc)
             if not self._type.value_type:
                 # non-value types also get copy constructor (possibly disabled), and disabled assignment
                 _sizeof = self._type.lookup('_sizeof', Method)
                 sizestr = str(self._type.size)
                 if _sizeof is None or _hasconfig(sizestr):
                     access = self._access('private', access)
-                    print >>self._inc, T("  $name(const $name&);")[self._type]
-                    print >>self._inc, T("  $name& operator=(const $name&);")[self._type]
+                    print(T("  $name(const $name&);")[self._type], file=self._inc)
+                    print(T("  $name& operator=(const $name&);")[self._type], file=self._inc)
                 else:
                     access = self._access('public', access)
-                    print >>self._inc, _TEMPL('copy_ctor').render(classname=self._type.name)
+                    print(_TEMPL('copy_ctor').render(classname=self._type.name), file=self._inc)
                 
 
         if self._abs:
             # need virtual destructor
             access = self._access("public", access)
-            print >>self._inc, T("  virtual ~$name();")[self._type]
-            print >>self._cpp, T("\n$name::~$name() {}\n")[self._type]
+            print(T("  virtual ~$name();")[self._type], file=self._inc)
+            print(T("\n$name::~$name() {}\n")[self._type], file=self._cpp)
 
         # generate methods (for interfaces public methods only)
         for meth in self._type.methods(): 
@@ -218,7 +219,7 @@ class CppTypeCodegen ( object ) :
                 self._genAttrDecl(attr)
 
         # close class declaration
-        print >>self._inc, "};"
+        print("};", file=self._inc)
 
         # enum stream insertions
         for enum in self._type.enums() :
@@ -226,29 +227,29 @@ class CppTypeCodegen ( object ) :
 
         # close pragma pack
         if needPragmaPack : 
-            print >>self._inc, "#pragma pack(pop)"
+            print("#pragma pack(pop)", file=self._inc)
 
     def _access(self, newaccess, oldaccess):
         if newaccess != oldaccess:
-            print >>self._inc, newaccess+":"
+            print(newaccess+":", file=self._inc)
         return newaccess
         
     def _genConst(self, const):
         
         doc = ""
         if const.comment: doc = T("/**< $comment */ ")[const]
-        print >>self._inc, T("  enum { $name = $value $doc};")(name=const.name, value=const.value, doc=doc)
+        print(T("  enum { $name = $value $doc};")(name=const.name, value=const.value, doc=doc), file=self._inc)
 
     def _genEnum(self, enum):
         
-        print >>self._inc, _TEMPL('enum_decl').render(locals())
+        print(_TEMPL('enum_decl').render(locals()), file=self._inc)
 
     def _genEnumPrint(self, enum):
         
         if not enum.name: return
         
-        print >>self._inc, _TEMPL('enum_print_decl').render(locals())
-        print >>self._cpp, _TEMPL('enum_print_impl').render(locals())
+        print(_TEMPL('enum_print_decl').render(locals()), file=self._inc)
+        print(_TEMPL('enum_print_impl').render(locals()), file=self._cpp)
 
     def _genAttrDecl(self, attr):
         """Generate attribute declaration"""
@@ -270,7 +271,7 @@ class CppTypeCodegen ( object ) :
             else :
                 dim = _interpolate(_dims(attr.shape.dims), attr.parent)
                 decl = T("  //$type\t$name$shape;")(type=_typename(attr.stor_type), name=attr.name, shape=dim)
-        print >>self._inc, decl
+        print(decl, file=self._inc)
 
 
     def _genMethod(self, meth):
@@ -459,12 +460,12 @@ class CppTypeCodegen ( object ) :
             argsspec = ', '.join([_argdecl(*arg) for arg in cargs])
             abstract = self._abs and not static
     
-            print >>self._inc, _TEMPL('method_decl').render(locals())
+            print(_TEMPL('method_decl').render(locals()), file=self._inc)
     
             if not abstract and body and not inline:
                 # out-of-line method
                 classname = self._type.name
-                print >>self._cpp, _TEMPL('method_impl').render(locals())
+                print(_TEMPL('method_impl').render(locals()), file=self._cpp)
 
 
     def _genCtor(self, ctor):
@@ -537,7 +538,7 @@ class CppTypeCodegen ( object ) :
         if not genDef:
             
             # simply a declaration
-            print >>self._inc, _TEMPL('ctor_decl').render(locals())
+            print(_TEMPL('ctor_decl').render(locals()), file=self._inc)
 
         else:
             
@@ -554,13 +555,13 @@ class CppTypeCodegen ( object ) :
             if 'inline' in ctor.tags:
                 
                 # inline the definition
-                print >>self._inc, _interpolate(_TEMPL('ctor_decl_inline').render(locals()), self._type)
+                print(_interpolate(_TEMPL('ctor_decl_inline').render(locals()), self._type), file=self._inc)
 
             else:
             
                 # out-line the definition
-                print >>self._inc, _TEMPL('ctor_decl').render(locals())
-                print >>self._cpp, _interpolate(_TEMPL('ctor_impl').render(locals()), self._type)
+                print(_TEMPL('ctor_decl').render(locals()), file=self._inc)
+                print(_interpolate(_TEMPL('ctor_impl').render(locals()), self._type), file=self._cpp)
 
 
     def _genAttrShapeDecl(self, attr):

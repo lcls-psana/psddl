@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import sys
 import glob
@@ -145,8 +146,8 @@ def standardWrapper(description, epilog=programDescriptionEpilog,
     args = parser.parse_args()
 
     if args.show:
-        print "Default exclude: %s" % defaultExclude
-        print "exiting early."
+        print("Default exclude: %s" % defaultExclude)
+        print("exiting early.")
         sys.exit(0)
 
     exclude = list(copy.deepcopy(defaultExclude))

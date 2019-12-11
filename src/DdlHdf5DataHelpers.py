@@ -16,6 +16,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andy Salnikov
 """
+from __future__ import print_function
 
 
 #------------------------------
@@ -288,8 +289,8 @@ class DatasetCompound(object):
 
         hds = self
 
-        print >>cpp, self._genH5TypeFunc("stored")
-        print >>cpp, self._genH5TypeFunc("native")
+        print(self._genH5TypeFunc("stored"), file=cpp)
+        print(self._genH5TypeFunc("native"), file=cpp)
 
         # if schema contains single dataset and corresponding data type is a value type
         # then add conversion function from this dataset class to a data type
@@ -323,10 +324,10 @@ class DatasetCompound(object):
         pointers = [attr.name for attr in self.ds.attributes if attr.rank > 0 and not attr.sizeIsConst()]
         vlen_pointers = [attr.name for attr in self.ds.attributes if attr.rank > 0 and attr.type.name != 'char' and attr.sizeIsVlen()]
 
-        print >>inc, _TEMPL('compound_dataset_decl').render(locals())
+        print(_TEMPL('compound_dataset_decl').render(locals()), file=inc)
 
         # generate constructor and destructor
-        print >>cpp, _TEMPL('compound_dataset_ctor_dtor').render(locals())
+        print(_TEMPL('compound_dataset_ctor_dtor').render(locals()), file=cpp)
 
     def _genH5TypeFunc(self, func):
         """
@@ -703,11 +704,11 @@ class SchemaValueType(SchemaType):
                 expr = '{0}({1})'.format(dsattr.type.fullName('C++', self.psana_ns), expr)
             args.append(expr)
 
-        print >>inc, _TEMPL('proxy_valtype_declaration').render(locals())
-        print >>cpp, _TEMPL('proxy_valtype_impl_getTypedImpl').render(locals())
+        print(_TEMPL('proxy_valtype_declaration').render(locals()), file=inc)
+        print(_TEMPL('proxy_valtype_impl_getTypedImpl').render(locals()), file=cpp)
 
 
-        print >>cpp, _TEMPL('schema_store_impl').render(locals())
+        print(_TEMPL('schema_store_impl').render(locals()), file=cpp)
         
 class SchemaAbstractType(SchemaType):
     '''
@@ -756,11 +757,11 @@ class SchemaAbstractType(SchemaType):
             dsName = ds.ds.name
             dsCtorWithArg = T('(const ${decltype}& ds) : m_ds_${dsName}(ds) {}')(locals())
 
-        print >>inc, _TEMPL('abstract_type_declaration').render(locals())
+        print(_TEMPL('abstract_type_declaration').render(locals()), file=inc)
         for line in cpp_code:
-            print >>cpp, line
+            print(line, file=cpp)
 
-        print >>cpp, _TEMPL('schema_store_impl').render(locals())
+        print(_TEMPL('schema_store_impl').render(locals()), file=cpp)
         
 
     def _genAttrShapeDecl(self, attr):

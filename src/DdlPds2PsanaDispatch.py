@@ -18,6 +18,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andrei Salnikov
 """
+from __future__ import print_function
 
 
 #------------------------------
@@ -209,8 +210,8 @@ class DdlPds2PsanaDispatch ( object ) :
         # generate code for typeInfoPtrs function
         typeInfoPtrsCode = _TEMPL('typeinfoptrs').render(locals())
 
-        print >>self.inc, _TEMPL('header_template').render(locals())
-        print >>self.cpp, _TEMPL('impl_template').render(locals())
+        print(_TEMPL('header_template').render(locals()), file=self.inc)
+        print(_TEMPL('impl_template').render(locals()), file=self.cpp)
         
         # close dispatch function files
         self.inc.close()

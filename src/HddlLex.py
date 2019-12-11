@@ -16,6 +16,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andy Salnikov
 """
+from __future__ import print_function
 
 
 #------------------------------
@@ -206,7 +207,7 @@ class HddlLex(object):
         while True:
              tok = self.lexer.token()
              if not tok: break
-             print tok
+             print(tok)
 
 #
 #  In case someone decides to run this module

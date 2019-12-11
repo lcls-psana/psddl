@@ -21,6 +21,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author $Author$ 
 """
+from __future__ import print_function
 
 #------------------------------
 #  Module's version from CVS --
@@ -241,7 +242,7 @@ def getBasicAttrNoAccessor(ptype):
     nonBasicNames = [attr.name for attr in attributesWithNoAccessors \
                      if (attrib.shape is not None) or (not isBasicType(attrib.type.name))]
     msg += ' '.join(nonBasicNames)
-    print msg
+    print(msg)
 
   basic_attr = [(attrname, getDumpFunction(attrtype)) for attrname, attrtype in attributesBasic]
   return basic_attr
@@ -349,7 +350,7 @@ def categorize(ptype):
   def handle_basic_args_not_array(namespace, ptype, method, arrstr, psana_type):
     rule = getBasicNotArrayRule(namespace, ptype.name, method.name)
     if rule is None:
-      print "notProcessed 110: %s" % methodInfo(method, arrstr, namespace, ptype)
+      print("notProcessed 110: %s" % methodInfo(method, arrstr, namespace, ptype))
       return
     cmd, sub = rule
     if cmd == 'skip':
@@ -364,12 +365,12 @@ def categorize(ptype):
                                                    getDumpFunction(method.type),
                                                    sub))
       return
-    print "notProcessed 110: %s" % methodInfo(method, arrstr, namespace, ptype)
+    print("notProcessed 110: %s" % methodInfo(method, arrstr, namespace, ptype))
 
   def handle_not_basic_not_args_array(namespace, ptype, method, arrstr, 
                                       psana_type, methodReturnTypeNamespace):
     if method.rank != 1:
-      print "notProcessed 001: %s" % methodInfo(method, arrstr, namespace, ptype)
+      print("notProcessed 001: %s" % methodInfo(method, arrstr, namespace, ptype))
       return
     if method.type.name == 'char':
       psana_type.one_line_methods.append((method.name, 'obj.%s()' % method.name, 'str_to_str'))
@@ -380,7 +381,7 @@ def categorize(ptype):
         if method.name == 'capacitorValues' and namespace == 'Ipimb' and ptype.name.startswith('ConfigV'):
           sizeExpr = 4
         else:
-          print "notProcessed 001: enum but no sizeExpr  %s" % (methodInfo(method, arrstr, namespace, ptype),)
+          print("notProcessed 001: enum but no sizeExpr  %s" % (methodInfo(method, arrstr, namespace, ptype),))
           return
       psana_type.idx_list_one_line_methods.append((method.name, 
                                                    getDumpFunction(method.type),
@@ -390,7 +391,7 @@ def categorize(ptype):
     # a list of the object. 
     # If it is not a value type, then the method will get an index argument.
     if not method.attribute:
-      print "notProcessed 001: method has no attribute: %s" % methodInfo(method, arrstr, namespace, ptype)
+      print("notProcessed 001: method has no attribute: %s" % methodInfo(method, arrstr, namespace, ptype))
       return
     attr = method.attribute
     if attr.type.value_type:
@@ -400,7 +401,7 @@ def categorize(ptype):
       # the method will take an index argument. Need to determine expression for last element.
       sizeExpr = getSizeExpr(method)
       if not sizeExpr:
-        print "notProcessed 001: no sizeExpr %s" % methodInfo(method, arrstr, namespace, ptype)
+        print("notProcessed 001: no sizeExpr %s" % methodInfo(method, arrstr, namespace, ptype))
         return
       psana_type.idx_list_multi_line_methods.append((method.name, 
                                                      getDumpFunction(method.type, methodReturnTypeNamespace),
@@ -452,16 +453,16 @@ def categorize(ptype):
                                           getDumpFunction(method.type)))
 
     elif basic == False and args == True and  array == False: #  010
-      print "notProcessed 010: %s" % methodInfo(method, arrstr, namespace, ptype)
+      print("notProcessed 010: %s" % methodInfo(method, arrstr, namespace, ptype))
 
     elif basic == True and args == True and array == False:   #  110
       handle_basic_args_not_array(namespace, ptype, method, arrstr, psana_type)
 
     elif basic == False and args == True and array == True:   #  011
-      print "notProcessed 011: %s" % methodInfo(method, arrstr, namespace, ptype)
+      print("notProcessed 011: %s" % methodInfo(method, arrstr, namespace, ptype))
 
     elif basic == True and args == True and array == True:    #  111
-      print "notProcessed 111: %s" % methodInfo(method, arrstr, namespace, ptype)
+      print("notProcessed 111: %s" % methodInfo(method, arrstr, namespace, ptype))
 
     elif basic == False and args == False and array  == True: #  001
       handle_not_basic_not_args_array(namespace, ptype, method, arrstr, 

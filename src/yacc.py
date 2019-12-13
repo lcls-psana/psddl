@@ -59,6 +59,9 @@
 # own risk!
 # ----------------------------------------------------------------------------
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 __version__    = "3.4"
 __tabversion__ = "3.2"       # Table version
 
@@ -175,7 +178,7 @@ def format_stack_entry(r):
 #        .lexpos     = Starting lex position
 #        .endlexpos  = Ending lex position (optional, set automatically)
 
-class YaccSymbol:
+class YaccSymbol(object):
     def __str__(self):    return self.type
     def __repr__(self):   return str(self)
 
@@ -188,7 +191,7 @@ class YaccSymbol:
 # for a symbol.  The lexspan() method returns a tuple (lexpos,endlexpos)
 # representing the range of positional information for a symbol.
 
-class YaccProduction:
+class YaccProduction(object):
     def __init__(self,s,stack=None):
         self.slice = s
         self.stack = stack
@@ -236,7 +239,7 @@ class YaccProduction:
 # The LR Parsing engine.
 # -----------------------------------------------------------------------------
 
-class LRParser:
+class LRParser(object):
     def __init__(self,lrtab,errorf):
         self.productions = lrtab.lr_productions
         self.action      = lrtab.lr_action
@@ -1190,7 +1193,7 @@ class Production(object):
     def __len__(self):
         return len(self.prod)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return 1
 
     def __getitem__(self,index):

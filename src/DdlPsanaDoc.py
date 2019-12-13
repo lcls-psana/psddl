@@ -125,7 +125,7 @@ def _typedecl(type):
 
 def _esc(s):
     if type(s) == type({}):
-        return dict([(k, _esc(v)) for k, v in s.iteritems()])
+        return dict([(k, _esc(v)) for k, v in s.items()])
     elif type(s) == type(""):
         return cgi.escape(s)
     else:

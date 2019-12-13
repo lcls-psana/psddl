@@ -1,3 +1,4 @@
+from __future__ import division
 # -----------------------------------------------------------------------------
 # ply: lex.py
 #
@@ -31,6 +32,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
+from past.builtins import cmp
+from builtins import object
 __version__    = "3.4"
 __tabversion__ = "3.2"       # Version of table file used
 
@@ -111,7 +114,7 @@ class NullLogger(object):
 #    lexpos           -  Current position in the input string
 # -----------------------------------------------------------------------------
 
-class Lexer:
+class Lexer(object):
     def __init__(self):
         self.lexre = None             # Master regular expression. This is a list of
                                       # tuples (re,findex) where re is a compiled
@@ -401,7 +404,7 @@ class Lexer:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         t = self.token()
         if t is None:
             raise StopIteration
@@ -503,7 +506,7 @@ def _form_master_re(relist,reflags,ldict,toknames):
         
         return [(lexre,lexindexfunc)],[regex],[lexindexnames]
     except Exception:
-        m = int(len(relist)/2)
+        m = len(relist)//2
         if m == 0: m = 1
         llist, lre, lnames = _form_master_re(relist[:m],reflags,ldict,toknames)
         rlist, rre, rnames = _form_master_re(relist[m:],reflags,ldict,toknames)

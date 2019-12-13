@@ -188,7 +188,7 @@ class DdlHdf5DataDispatch ( object ) :
                 if not ns.external:
                     types.append(ns)
 
-        typenames = [type.fullName('C++') for type in types] + _aliases.keys()
+        typenames = [type.fullName('C++') for type in types] + list(_aliases.keys())
 
         # select hash function with minimum collisions
         hash = _DJB2a()

@@ -18,11 +18,14 @@ part of it, please give an appropriate acknowledgment.
 
 @author Andrei Salnikov
 """
+from __future__ import division
 
 
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
+from builtins import str
+from past.utils import old_div
 __version__ = "$Revision$"
 # $Source$
 
@@ -236,7 +239,7 @@ class Type ( Namespace ) :
         
         # adjust for a padding after last element
         align = ExprVal(self.align)
-        if self.align: offset = ( (offset + align - ExprVal(1)) / align ) * align
+        if self.align: offset = ( old_div((offset + align - ExprVal(1)), align) ) * align
         
         logging.debug('_calcOffsets: type=%r size = %s', self, self.size)
         if self.size:
@@ -310,7 +313,7 @@ class Type ( Namespace ) :
 
             # adjust for a padding after last element
             align = ExprVal(self.align)
-            if self.align: expr = ( (expr + align - ExprVal(1)) / align ) * align
+            if self.align: expr = ( old_div((expr + align - ExprVal(1)), align) ) * align
 
             expr = str(expr)
             logging.debug("_genSizeof: expr=%s", expr)

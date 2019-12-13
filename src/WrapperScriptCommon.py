@@ -186,7 +186,7 @@ def standardWrapper(description, epilog=programDescriptionEpilog,
             pkg = pkgh5.split('-h5')[0]
             assert pkg in pkgdict, "psddl_hdf2psana ddl file exists for a package that doesn't exist in psddldata: %s" % ddlFile
             pkgdict[pkg]['h5schema']=ddlFile
-        for pkg,subdict in pkgdict.iteritems():
+        for pkg,subdict in pkgdict.items():
             if 'h5schema' not in subdict:
                 subdict['h5schema']=''
 

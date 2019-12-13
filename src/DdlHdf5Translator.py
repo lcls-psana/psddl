@@ -341,7 +341,7 @@ class DdlHdf5Translator ( object ) :
         # del typeAliasMap['PrincetonInfo']
 
         aliasesOrderedForTemplates = []
-        aliases = typeAliasMap.keys()
+        aliases = list(typeAliasMap.keys())
         aliases.sort()
         for alias in aliases:
             typeList = list(typeAliasMap[alias])
@@ -407,7 +407,7 @@ class DdlHdf5Translator ( object ) :
         tmpl = self.jiEnv.get_template('hdf5Translator.tmpl?hdfwritermap_cpp')
         fname = os.path.join(self.packageDir, 'src', 'HdfWriterMap.cpp')
         fout = file(fname,'w')
-        psana_types = psanaTypes.keys()
+        psana_types = list(psanaTypes.keys())
         psana_types.sort()
         # fix ups
         namespaces = [ns for ns in namespaces if ns not in ['Pds']]

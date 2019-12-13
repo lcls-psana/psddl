@@ -124,7 +124,7 @@ def makePythonXtcDispatchList(xtcTypes):
     for example:   Lusi_IpmFexConfigV2_to_str
   '''
   xtc_dispatch_list = []
-  keys = xtcTypes.keys()
+  keys = list(xtcTypes.keys())
   keys.sort()
   for key in keys:
     xtcType = xtcTypes[key]
@@ -160,7 +160,7 @@ basic_arg_not_array = {('Alias.SrcAlias','operator<'):('skip',None),
 
 def getBasicNotArrayRule(namespace, classname, methodname):
   nc = '%s.%s' % (namespace, classname)
-  for key,rule in basic_arg_not_array.iteritems():
+  for key,rule in basic_arg_not_array.items():
     keyNc, keyMethod = key
     if nc.startswith(keyNc):
       if methodname == keyMethod:

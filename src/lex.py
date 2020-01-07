@@ -99,6 +99,8 @@ class NullLogger(object):
         return self
     def __call__(self,*args,**kwargs):
         return self
+    def __bool__(self):
+        return True
 
 # -----------------------------------------------------------------------------
 #                        === Lexing Engine ===

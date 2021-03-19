@@ -237,7 +237,7 @@ class DdlPythonInterfaces ( object ) :
         print("void createWrappers(PyObject* module) {", file=self.cpp)
 
         # create sub-module for everything inside
-        print(T('  PyObject* submodule = Py_InitModule3( "psana.$name", 0, "The Python wrapper module for $name types");')[self.pkg], file=self.cpp)
+        print(T('  DDL_CREATE_MODULE( "psana.$name", 0, "The Python wrapper module for $name types");')[self.pkg], file=self.cpp)
         print('  Py_INCREF(submodule);', file=self.cpp)
         print(T('  PyModule_AddObject(module, "$name", submodule);')[self.pkg], file=self.cpp)
         print('  scope mod = object(handle<>(borrowed(submodule)));', file=self.cpp)

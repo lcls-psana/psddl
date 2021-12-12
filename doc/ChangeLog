@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-02
+2021-12-12 Daniel Damiani
+Bitfields with 64bits now work when using more than the lower 32bits
+
 Tag: V00-13-25
 2016-12-7 David Schneider
 Generate trace message if config object not found and event data not stored

@@ -75,16 +75,28 @@ class Bitfield ( object ) :
     def expr(self):
         
         expr = "@self."+self.parent.name
-        if self.offset > 0 :
-            expr = "(%s>>%d)" % (expr, self.offset)
-        expr = "%s(%s & %#x)" % (self.type.name, expr, self.bitmask)
+        if self.parent.type.size > 4:
+            cast = self.parent.type.name
+            if self.offset > 0 :
+                expr = "(%s>>%s(%d))" % (expr, cast, self.offset)
+            expr = "%s(%s & %s(%#x))" % (self.type.name, expr, cast, self.bitmask)
+        else:
+            if self.offset > 0 :
+                expr = "(%s>>%d)" % (expr, self.offset)
+            expr = "%s(%s & %#x)" % (self.type.name, expr, self.bitmask)
         return expr
 
     def assignExpr(self, name):
         
-        expr = "((%s) & %#x)" % (name, self.bitmask)
-        if self.offset > 0 :
-            expr = "(%s<<%d)" % (expr, self.offset)
+        if self.parent.type.size > 4:
+            cast = self.parent.type.name
+            expr = "((%s) & %s(%#x))" % (name, cast, self.bitmask)
+            if self.offset > 0 :
+                expr = "(%s<<%s(%d))" % (expr, cast, self.offset)
+        else:
+            expr = "((%s) & %#x)" % (name, self.bitmask)
+            if self.offset > 0 :
+                expr = "(%s<<%d)" % (expr, self.offset)
         return expr
 
     def __str__(self):
